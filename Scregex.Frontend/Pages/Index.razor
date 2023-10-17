@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject HttpClient Http
 @using Scregex.Core.Game
+@using System.Text.RegularExpressions
 
 <PageTitle>Index</PageTitle>
 
@@ -55,29 +56,37 @@
     </board>
     <wordlist>
         <ul>
-            @foreach (var word in _availableWords)
+            @foreach (var word in DisplayedWords())
             {
-                <li>@word</li>
+                <li @onclick="() => SelectWord(word)">@word</li>
             }
         </ul>
     </wordlist>
 </div>
-<div>
-    <input type="text" @bind="_newWord" @bind:after="RefreshValues"/>
-    <select @bind="_direction" @bind:after="RefreshValues">
-        <option value="@Direction.Horizontal" selected="selected">Horizontal</option>
-        <option value="@Direction.Vertical">Vertical</option>
-    </select>
-    <button onclick="@PlayAWord">></button>
+<div style="margin: 1em;">
+    <div>
+        <input type="text"
+               @bind-value="_newRegex"
+               @bind-value:event="oninput"
+               />
+    </div>
+    <div>
+        <input type="text" disabled @bind="_newWord" @bind:after="OnNewInput"/>
+        <select @bind="_direction" @bind:after="OnNewInput">
+            <option value="@Direction.Horizontal" selected="selected">Horizontal</option>
+            <option value="@Direction.Vertical">Vertical</option>
+        </select>
+        <button style="background-color: @PlayButtonColor();" onclick="@PlayAWord">→</button>
+    </div>
 </div>
-<div>Previously: @_lastResult</div>
-<div>Next: @_nextResult</div>
+
 
 @code {
     private GameEngine _game = null!;
     private char[] _values = new char[225];
 
     private string? _newWord;
+    private string? _newRegex;
     private Direction? _direction = Direction.Horizontal;
 
     private PlayResult? _lastResult;
@@ -85,6 +94,23 @@
     private Position? _lastSelectedCell = Position.Center;
     private string[] _availableWords = Array.Empty<string>();
 
+    private IEnumerable<string> DisplayedWords()
+    {
+        if (string.IsNullOrWhiteSpace(_newRegex)) return Array.Empty<string>();
+
+        var regex = new Regex(_newRegex);
+        return _availableWords.Where(it => regex.IsMatch(it)).Take(5);
+    }
+
+    private string PlayButtonColor()
+    {
+        if (_nextResult == PlayResult.Valid)
+        {
+            return "lightgreen";
+        }
+
+        return "lightcoral";
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,13 +122,13 @@
             .Where(it => !string.IsNullOrEmpty(it))
             );
 
-        RefreshValues();
+        SyncGameState();
     }
 
     private void SelectCell(Position position)
     {
         _lastSelectedCell = position;
-        RefreshValues();
+        PrecomputeNextResult();
     }
 
     private void PlayAWord()
@@ -110,15 +136,28 @@
         if (_newWord == null || _lastSelectedCell == null) return;
 
         _lastResult = _game.PlayWord(new PlayedWord(_newWord, _lastSelectedCell, _direction!.Value));
-        RefreshValues();
+        SyncGameState();
+        StateHasChanged();
     }
 
-    private void RefreshValues()
+    private void SyncGameState()
     {
         _values = _game.CurrentBoardSnapshot().CurrentValues();
-        _availableWords = _game.GetCurrentlyAvailableWords().ToArray(); // TODO only call this when necessary.
+        _availableWords = _game.GetCurrentlyAvailableWords().ToArray();
         PrecomputeNextResult();
         StateHasChanged();
+    }
+
+    private void OnNewInput()
+    {
+        PrecomputeNextResult();
+        StateHasChanged();
+    }
+
+    private void SelectWord(string word)
+    {
+        _newWord = word;
+        OnNewInput();
     }
 
     private void PrecomputeNextResult()
