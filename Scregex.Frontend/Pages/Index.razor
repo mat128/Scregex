@@ -83,6 +83,7 @@
                placeholder="Regular expression..."
                @bind-value="_newRegex"
                @bind-value:event="oninput"
+               @bind-value:after="OnNewRegex"
                />
     </div>
     <div>
@@ -102,19 +103,32 @@
 
     private string? _newWord;
     private string? _newRegex;
+    private Regex? _regex;
     private Direction? _direction = Direction.Horizontal;
 
-    private PlayResult? _lastResult;
     private PlayResult? _nextResult;
     private Position? _lastSelectedCell = Position.Center;
     private string[] _availableWords = Array.Empty<string>();
 
     private IEnumerable<string> DisplayedWords()
     {
-        if (string.IsNullOrWhiteSpace(_newRegex)) return Array.Empty<string>();
+        if (_regex == null) return Array.Empty<string>();
 
-        var regex = new Regex(_newRegex);
-        return _availableWords.Where(it => regex.IsMatch(it)).Take(10);
+        return _availableWords.Where(it => _regex.IsMatch(it)).Take(10);
+    }
+
+    private void OnNewRegex()
+    {
+        if (string.IsNullOrWhiteSpace(_newRegex)) return;
+
+        try
+        {
+            _regex = new Regex(_newRegex);
+        }
+        catch
+        {
+            _regex = null;
+        }
     }
 
     private string PlayButtonColor()
@@ -129,7 +143,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var wordList = await Http.GetStringAsync("ODS8_A.txt");
+        var wordList = await Http.GetStringAsync("ODS8_100k.txt");
         _game = new GameEngine(wordList
             .ToUpperInvariant()
             .Split('\n')
@@ -150,7 +164,7 @@
     {
         if (_newWord == null || _lastSelectedCell == null) return;
 
-        _lastResult = _game.PlayWord(new PlayedWord(_newWord, _lastSelectedCell, _direction!.Value));
+        _game.PlayWord(new PlayedWord(_newWord, _lastSelectedCell, _direction!.Value));
         SyncGameState();
         StateHasChanged();
     }
