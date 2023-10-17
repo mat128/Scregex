@@ -35,4 +35,16 @@ public class PositionTest
     {
         Assert.Throws<ArgumentException>(() => Position.FromCoordinates(coordinates));
     }
+
+    [InlineData("A1", 0)]
+    [InlineData("A2", 1)]
+    [InlineData("A15", 14)]
+    [InlineData("B1", 15)]
+    [InlineData("B15", 29)]
+    [InlineData("O15", 224)]
+    [Theory]
+    public void CanTellIts1DCoordinate(string coordinates, int expected)
+    {
+        Assert.Equal(expected, Position.FromCoordinates(coordinates).OneDimensionCoordinate());
+    }
 }

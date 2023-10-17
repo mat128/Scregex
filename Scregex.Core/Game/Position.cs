@@ -9,6 +9,13 @@ public record Position(int X, int Y)
     // Coordinates are 0-based, starting top left.
 
     public static readonly Position Center = new(7, 7);
+    public const int BoardWidth = 15;
+    public const int BoardHeight = 15;
+
+    public int OneDimensionCoordinate()
+    {
+        return Y * BoardWidth + X;
+    }
 
     public static Position FromCoordinates(string coordinates)
     {
@@ -21,7 +28,7 @@ public record Position(int X, int Y)
         int row = rowNumber - 0x41;
 
         var columnPos = int.Parse(coordinates[1..]);
-        if (columnPos is < 1 or > 15) throw new ArgumentException("Invalid coordinates", nameof(coordinates));
+        if (columnPos is < 1 or > BoardWidth) throw new ArgumentException("Invalid coordinates", nameof(coordinates));
 
         return new Position(columnPos - 1, row);
     }

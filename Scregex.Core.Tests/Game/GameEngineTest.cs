@@ -80,4 +80,83 @@ public class GameEngineTest
 
         Assert.Equal(PlayResult.Invalid, result);
     }
+
+    [Fact]
+    public void GameBoardReflectsCurrentState_WithoutPlaying()
+    {
+        var game = new GameEngine(new [] { "compiler" });
+
+        var board = game.CurrentBoardSnapshot();
+
+        Assert.Equal(
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               ", board.AsText());
+    }
+
+    [Fact]
+    public void GameBoardReflectsCurrentState_AfterPlayingFirstWord_Horizontal()
+    {
+        var game = new GameEngine(new [] { "compiler" });
+
+        game.PlayWord("compiler", new Position(0, 7), Direction.Horizontal);
+
+        var board = game.CurrentBoardSnapshot();
+
+        Assert.Equal(
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "compiler       " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               ", board.AsText());
+    }
+
+    [Fact]
+    public void GameBoardReflectsCurrentState_AfterPlayingFirstWord_Vertical()
+    {
+        var game = new GameEngine(new [] { "compiler" });
+
+        game.PlayWord("compiler", new Position(7, 7), Direction.Vertical);
+
+        var board = game.CurrentBoardSnapshot();
+
+        Assert.Equal(
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "               " + "\n" +
+            "       c       " + "\n" +
+            "       o       " + "\n" +
+            "       m       " + "\n" +
+            "       p       " + "\n" +
+            "       i       " + "\n" +
+            "       l       " + "\n" +
+            "       e       " + "\n" +
+            "       r       ", board.AsText());
+    }
 }

@@ -42,4 +42,9 @@ public class GameEngine
     {
         return !GetCurrentlyAvailableWords().Contains(word.Word);
     }
+
+    public GameBoard CurrentBoardSnapshot()
+    {
+        return new GameBoard(_playedWords);
+    }
 }

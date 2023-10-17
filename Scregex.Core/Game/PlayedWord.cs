@@ -26,4 +26,21 @@ public record PlayedWord(string Word, Position Position, Direction Direction)
             _ => false
         };
     }
+
+    public IEnumerable<PlayedCharacter> Characters()
+    {
+        var chars = new PlayedCharacter[Word.Length];
+
+        for (int i = 0; i < Word.Length; i++)
+        {
+            Position position = Direction switch
+            {
+                Direction.Horizontal => StartPosition() with { X = StartPosition().X + i },
+                Direction.Vertical => StartPosition() with { Y = StartPosition().Y + i },
+            };
+            chars[i] = new PlayedCharacter(Word[i], position);
+        }
+
+        return chars;
+    }
 }

@@ -55,4 +55,18 @@ public class PlayedWordTest
         Assert.False(word.Crosses(new Position(1, 6)));
         Assert.False(word.Crosses(new Position(2, 1)));
     }
+
+    [Fact]
+    public void ReturnsAllCharactersAndTheirPosition()
+    {
+        var word = new PlayedWord("hello", new Position(1, 1), Direction.Horizontal);
+
+        var characters = word.Characters().ToList();
+
+        Assert.Contains(new PlayedCharacter('h', new Position(1, 1)), characters);
+        Assert.Contains(new PlayedCharacter('e', new Position(2, 1)), characters);
+        Assert.Contains(new PlayedCharacter('l', new Position(3, 1)), characters);
+        Assert.Contains(new PlayedCharacter('l', new Position(4, 1)), characters);
+        Assert.Contains(new PlayedCharacter('o', new Position(5, 1)), characters);
+    }
 }
