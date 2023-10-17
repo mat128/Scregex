@@ -1,9 +1,128 @@
 ﻿@page "/"
+@using Scregex.Core.Game
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<style>
+    board {
+        display: grid;
+        grid-template-columns: repeat(15, auto);
+        grid-template-rows: repeat(15, auto);
+        justify-content: center;
+        align-items: center;
+        justify-items: center;
+        grid-gap: 0.1em;
+        font-size: 20px;
+    }
 
-Welcome to your new app.
+    cell {
+        display:  flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffefc7;
+        border: 0.1em solid black;
+        width: 2em;
+        height: 2em;
+        padding: 0.5em;
+        text-align: center;
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    cell.selected {
+        border: 0.2em solid;
+    }
+
+    cell.center.unplayed {
+        background-image: url("iconmonstr-star-3.svg");
+        background-size: contain;
+    }
+</style>
+
+<div style="display: flex; flex-wrap: wrap">
+    <board>
+        @for (int cellId = 0; cellId < 225; cellId++)
+        {
+            var position = Position.FromFlatCoordinate(cellId);
+            var value = _values[cellId];
+            <cell class="@CalculateCssClassFor(position)" data-cellid="@(cellId)" @onclick="@(() => SelectCell(position))">@value</cell>
+        }
+    </board>
+    <div>
+        <ul>
+            @foreach (var word in _game.GetCurrentlyAvailableWords())
+            {
+                <li>@word</li>
+            }
+        </ul>
+    </div>
+</div>
+<div>
+    <input type="text" @bind="_newWord"/>
+    <select @bind="_direction" @bind:after="RefreshValues">
+        <option value="@Direction.Horizontal" selected="selected">Horizontal</option>
+        <option value="@Direction.Vertical">Vertical</option>
+    </select>
+    <button onclick="@PlayAWord">></button>
+</div>
+<div>@_lastResult</div>
+
+@code {
+    private GameEngine _game = null!;
+    private char[] _values = new char[225];
+
+    private string? _newWord;
+    private Direction? _direction = Direction.Horizontal;
+
+    private PlayResult? _lastResult;
+    private Position? _lastSelectedCell = Position.Center;
+
+    protected override void OnInitialized()
+    {
+        _game = new GameEngine(new[]
+        {
+            "AZURE",
+            "MICROSOFT",
+            "DOTNET"
+        });
+
+        RefreshValues();
+    }
+
+    private void SelectCell(Position position)
+    {
+        _lastSelectedCell = position;
+        RefreshValues();
+    }
+
+    private void PlayAWord()
+    {
+        if (_newWord == null || _lastSelectedCell == null) return;
+
+        _lastResult = _game.PlayWord(_newWord, _lastSelectedCell, Direction.Horizontal);
+        RefreshValues();
+    }
+
+    private void RefreshValues()
+    {
+        _values = _game.CurrentBoardSnapshot().CurrentValues();
+        StateHasChanged();
+    }
+
+    private string CalculateCssClassFor(Position position)
+    {
+        List<string> classes = new();
+        if (position == _lastSelectedCell) classes.Add("selected");
+        if (position == Position.Center) classes.Add("center");
+        if (_values[position.FlatCoordinate()] == ' ')
+        {
+            classes.Add("unplayed");
+        }
+        else
+        {
+            classes.Add("played");
+        }
+
+        return string.Join(" ", classes);
+    }
+
+}
