@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject HttpClient Http
 @using Scregex.Core.Game
 
 <PageTitle>Index</PageTitle>
@@ -36,6 +37,11 @@
         background-image: url("iconmonstr-star-3.svg");
         background-size: contain;
     }
+
+    wordlist {
+        overflow: hidden;
+        height: 40em;
+    }
 </style>
 
 <div style="display: flex; flex-wrap: wrap">
@@ -47,24 +53,25 @@
             <cell class="@CalculateCssClassFor(position)" data-cellid="@(cellId)" @onclick="@(() => SelectCell(position))">@value</cell>
         }
     </board>
-    <div>
+    <wordlist>
         <ul>
-            @foreach (var word in _game.GetCurrentlyAvailableWords())
+            @foreach (var word in _availableWords)
             {
                 <li>@word</li>
             }
         </ul>
-    </div>
+    </wordlist>
 </div>
 <div>
-    <input type="text" @bind="_newWord"/>
+    <input type="text" @bind="_newWord" @bind:after="RefreshValues"/>
     <select @bind="_direction" @bind:after="RefreshValues">
         <option value="@Direction.Horizontal" selected="selected">Horizontal</option>
         <option value="@Direction.Vertical">Vertical</option>
     </select>
     <button onclick="@PlayAWord">></button>
 </div>
-<div>@_lastResult</div>
+<div>Previously: @_lastResult</div>
+<div>Next: @_nextResult</div>
 
 @code {
     private GameEngine _game = null!;
@@ -74,16 +81,20 @@
     private Direction? _direction = Direction.Horizontal;
 
     private PlayResult? _lastResult;
+    private PlayResult? _nextResult;
     private Position? _lastSelectedCell = Position.Center;
+    private string[] _availableWords = Array.Empty<string>();
 
-    protected override void OnInitialized()
+
+    protected override async Task OnInitializedAsync()
     {
-        _game = new GameEngine(new[]
-        {
-            "AZURE",
-            "MICROSOFT",
-            "DOTNET"
-        });
+        var wordList = await Http.GetStringAsync("ODS8_A.txt");
+        _game = new GameEngine(wordList
+            .ToUpperInvariant()
+            .Split('\n')
+            .Select(it => it.Trim())
+            .Where(it => !string.IsNullOrEmpty(it))
+            );
 
         RefreshValues();
     }
@@ -98,14 +109,28 @@
     {
         if (_newWord == null || _lastSelectedCell == null) return;
 
-        _lastResult = _game.PlayWord(_newWord, _lastSelectedCell, Direction.Horizontal);
+        _lastResult = _game.PlayWord(new PlayedWord(_newWord, _lastSelectedCell, _direction!.Value));
         RefreshValues();
     }
 
     private void RefreshValues()
     {
         _values = _game.CurrentBoardSnapshot().CurrentValues();
+        _availableWords = _game.GetCurrentlyAvailableWords().ToArray(); // TODO only call this when necessary.
+        PrecomputeNextResult();
         StateHasChanged();
+    }
+
+    private void PrecomputeNextResult()
+    {
+        if (_newWord != null && _lastSelectedCell != null && _direction != null)
+        {
+            _nextResult = _game.TryPlayWord(new PlayedWord(_newWord, _lastSelectedCell, _direction!.Value));
+        }
+        else
+        {
+            _nextResult = null;
+        }
     }
 
     private string CalculateCssClassFor(Position position)

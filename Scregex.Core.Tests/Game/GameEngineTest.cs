@@ -159,4 +159,28 @@ public class GameEngineTest
             "       e       " + "\n" +
             "       r       ", board.AsText());
     }
+
+    [Fact]
+    public void CanTellIfAWordIsWouldBeAccepted_WordAlreadyUsed()
+    {
+        var game = new GameEngine(new [] { "compiler" });
+
+        game.PlayWord(new PlayedWord("compiler", new Position(0, 7), Direction.Horizontal));
+
+        var result = game.TryPlayWord(new PlayedWord("compiler", new Position(0, 7), Direction.Vertical)); // valid placement-wise, but already used.
+
+        Assert.Equal(PlayResult.Invalid, result);
+    }
+
+    [Fact]
+    public void AcceptsWordsWithOverlappingIdenticalLetters()
+    {
+        var game = new GameEngine(new [] { "apple", "abacus" });
+
+        game.PlayWord(new PlayedWord("apple", Position.Center, Direction.Horizontal));
+
+        var result = game.TryPlayWord(new PlayedWord("abacus", Position.Center, Direction.Vertical)); // valid placement-wise, overlapping first letter
+
+        Assert.Equal(PlayResult.Valid, result);
+    }
 }

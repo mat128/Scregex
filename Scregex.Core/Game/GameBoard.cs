@@ -21,7 +21,7 @@ public class GameBoard
 
         foreach (var playedCharacter in _playedWords.SelectMany(word => word.Characters()))
         {
-            values[playedCharacter.position.FlatCoordinate()] = playedCharacter.character;
+            values[playedCharacter.Position.FlatCoordinate()] = playedCharacter.Character;
         }
 
         return values;
