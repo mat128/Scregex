@@ -45,6 +45,18 @@ public class PositionTest
     [Theory]
     public void CanTellIts1DCoordinate(string coordinates, int expected)
     {
-        Assert.Equal(expected, Position.FromCoordinates(coordinates).OneDimensionCoordinate());
+        Assert.Equal(expected, Position.FromCoordinates(coordinates).FlatCoordinate());
+    }
+
+    [InlineData(0, "A1")]
+    [InlineData(1, "A2")]
+    [InlineData(14, "A15")]
+    [InlineData(15, "B1")]
+    [InlineData(29, "B15")]
+    [InlineData(224, "O15")]
+    [Theory]
+    public void CanCreateFrom1DCoordinate(int coordinate1D, string coordinate)
+    {
+        Assert.Equal(Position.FromCoordinates(coordinate), Position.FromFlatCoordinate(coordinate1D));
     }
 }

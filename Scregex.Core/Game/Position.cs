@@ -12,7 +12,7 @@ public record Position(int X, int Y)
     public const int BoardWidth = 15;
     public const int BoardHeight = 15;
 
-    public int OneDimensionCoordinate()
+    public int FlatCoordinate()
     {
         return Y * BoardWidth + X;
     }
@@ -31,5 +31,10 @@ public record Position(int X, int Y)
         if (columnPos is < 1 or > BoardWidth) throw new ArgumentException("Invalid coordinates", nameof(coordinates));
 
         return new Position(columnPos - 1, row);
+    }
+
+    public static Position FromFlatCoordinate(int flatCoordinate)
+    {
+        return new Position(flatCoordinate % BoardWidth, flatCoordinate / BoardWidth);
     }
 }
