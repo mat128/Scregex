@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scregex.Frontend", "Scregex.Frontend\Scregex.Frontend.csproj", "{866A7C2B-E3B0-4085-AF4C-7350E69BE3FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scregex.Core", "Scregex.Core\Scregex.Core.csproj", "{326615C9-FAF0-492C-A63C-A14131C07BDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scregex.Core.Tests", "Scregex.Core.Tests\Scregex.Core.Tests.csproj", "{324015DA-4A32-4227-B8C4-A49A9E3A74C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{866A7C2B-E3B0-4085-AF4C-7350E69BE3FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{866A7C2B-E3B0-4085-AF4C-7350E69BE3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{866A7C2B-E3B0-4085-AF4C-7350E69BE3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{866A7C2B-E3B0-4085-AF4C-7350E69BE3FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{326615C9-FAF0-492C-A63C-A14131C07BDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{326615C9-FAF0-492C-A63C-A14131C07BDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{326615C9-FAF0-492C-A63C-A14131C07BDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{326615C9-FAF0-492C-A63C-A14131C07BDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{324015DA-4A32-4227-B8C4-A49A9E3A74C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{324015DA-4A32-4227-B8C4-A49A9E3A74C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{324015DA-4A32-4227-B8C4-A49A9E3A74C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{324015DA-4A32-4227-B8C4-A49A9E3A74C7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
