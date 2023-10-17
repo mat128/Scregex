@@ -43,6 +43,20 @@
         overflow: hidden;
         height: 40em;
     }
+
+    wordlist ul {
+        list-style-type: none
+    }
+
+    wordlist word {
+        background-color: #f3f3f3;
+        border: 0.1em black solid;
+        padding: 0.5em;
+        margin: 0.25em 0;
+        cursor: pointer;
+        display: block;
+        text-align: center;
+    }
 </style>
 
 <div style="display: flex; flex-wrap: wrap">
@@ -58,7 +72,7 @@
         <ul>
             @foreach (var word in DisplayedWords())
             {
-                <li @onclick="() => SelectWord(word)">@word</li>
+                <li><word @onclick="() => SelectWord(word)">@word</word></li>
             }
         </ul>
     </wordlist>
@@ -66,12 +80,13 @@
 <div style="margin: 1em;">
     <div>
         <input type="text"
+               placeholder="Regular expression..."
                @bind-value="_newRegex"
                @bind-value:event="oninput"
                />
     </div>
     <div>
-        <input type="text" disabled @bind="_newWord" @bind:after="OnNewInput"/>
+        <input type="text" placeholder="Select a word" disabled @bind="_newWord" @bind:after="OnNewInput"/>
         <select @bind="_direction" @bind:after="OnNewInput">
             <option value="@Direction.Horizontal" selected="selected">Horizontal</option>
             <option value="@Direction.Vertical">Vertical</option>
@@ -99,7 +114,7 @@
         if (string.IsNullOrWhiteSpace(_newRegex)) return Array.Empty<string>();
 
         var regex = new Regex(_newRegex);
-        return _availableWords.Where(it => regex.IsMatch(it)).Take(5);
+        return _availableWords.Where(it => regex.IsMatch(it)).Take(10);
     }
 
     private string PlayButtonColor()

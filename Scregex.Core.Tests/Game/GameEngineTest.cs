@@ -183,4 +183,40 @@ public class GameEngineTest
 
         Assert.Equal(PlayResult.Valid, result);
     }
+
+    [Theory]
+    [InlineData(Direction.Horizontal)]
+    [InlineData(Direction.Vertical)]
+    public void RefusesOutOfBoundsWords_TooLong(Direction direction)
+    {
+        var game = new GameEngine(new [] { "nineninen" });
+
+        var result = game.TryPlayWord(new PlayedWord("nineninen", Position.Center, direction));
+
+        Assert.Equal(PlayResult.Invalid, result);
+    }
+
+    [Fact]
+    public void RefusesWordsThatAddNothingToTheBoard()
+    {
+        var game = new GameEngine(new [] { "abaca", "abacas" });
+
+        game.PlayWord(new PlayedWord("abacas", Position.Center, Direction.Horizontal));
+
+        var result = game.TryPlayWord(new PlayedWord("abaca", Position.Center, Direction.Horizontal));
+
+        Assert.Equal(PlayResult.Invalid, result);
+    }
+
+    [Fact]
+    public void RefusesWithoutOverlappingCharacter()
+    {
+        var game = new GameEngine(new [] { "apple", "abacus" });
+
+        game.PlayWord(new PlayedWord("apple", Position.Center, Direction.Horizontal));
+
+        var result = game.TryPlayWord(new PlayedWord("abacus", new Position(0, 0), Direction.Horizontal));
+
+        Assert.Equal(PlayResult.Invalid, result);
+    }
 }

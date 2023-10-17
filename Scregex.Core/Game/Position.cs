@@ -17,6 +17,14 @@ public record Position(int X, int Y)
         return Y * BoardWidth + X;
     }
 
+    public bool IsWithinBounds()
+    {
+        if (X > (BoardWidth - 1)) return false;
+        if (Y > (BoardHeight - 1)) return false;
+
+        return true;
+    }
+
     public static Position FromCoordinates(string coordinates)
     {
         if (coordinates.Length is < 2 or > 3) throw new ArgumentException("Invalid coordinates", nameof(coordinates));

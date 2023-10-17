@@ -47,11 +47,38 @@ public class GameEngine
     {
         var tentativeWords = new List<PlayedWord>(_playedWords) { word };
 
+        if (!FirstPlayedWordCrossesCenter(tentativeWords)) return PlayResult.Invalid;
         if (!EachWordHasOnlyBeenUsedOnce(tentativeWords)) return PlayResult.Invalid;
         if (!OverlappingCharactersAreTheSame(tentativeWords)) return PlayResult.Invalid;
-        if (!FirstPlayedWordCrossesCenter(tentativeWords)) return PlayResult.Invalid;
+        if (!WordIsWithinBounds(word)) return PlayResult.Invalid;
+        if (!WordAddsPlayedCharacters(_playedWords, tentativeWords)) return PlayResult.Invalid;
+        if (!OneCharacterOverlaps(_playedWords, word)) return PlayResult.Invalid;
 
         return PlayResult.Valid;
+    }
+
+    private bool OneCharacterOverlaps(List<PlayedWord> playedWords, PlayedWord word)
+    {
+        if (playedWords.Count == 0) return true;
+
+        var alreadyPlayedPositions = playedWords.SelectMany(it => it.Characters().Select(c => c.Position));
+        var wordPositions = word.Characters().Select(it => it.Position);
+
+        return wordPositions.Any(it => alreadyPlayedPositions.Contains(it));
+    }
+
+    private static bool WordAddsPlayedCharacters(List<PlayedWord> previouslyPlayedWords, List<PlayedWord> tentativeWords)
+    {
+        var playedPositions = previouslyPlayedWords.SelectMany(it => it.Characters().Select(c => c.Position)).Distinct().ToList();
+        var tentativePositions = tentativeWords.SelectMany(it => it.Characters().Select(c => c.Position)).Distinct().ToList();
+
+        return tentativePositions.Count() > playedPositions.Count();
+    }
+
+
+    private bool WordIsWithinBounds(PlayedWord word)
+    {
+        return word.Characters().All(it => it.Position.IsWithinBounds());
     }
 
     private static bool EachWordHasOnlyBeenUsedOnce(List<PlayedWord> tentativeWords)
